@@ -48,4 +48,4 @@ Sample Screen
 
 This is sample, how the user management in ZeyOS looks like:
 
-![Sample screen][https://raw.githubusercontent.com/zeyosinc/sshkeymgr/master/ZeyOS/screenshot.png]
+![Sample screen](https://raw.githubusercontent.com/zeyosinc/sshkeymgr/master/ZeyOS/screenshot.png)
