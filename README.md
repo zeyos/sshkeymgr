@@ -35,7 +35,7 @@ Add a new cronjob to `/etc/cron.d`:
 # /etc/cron.d/zeyos-sshkeymgr
 # Updates the authorized_keys every hour
 
-0 * * * * /opt/sshkeymgr/sshkeymgr.sh PLATFORMID SERVERNAME >/dev/null 2>&1
+0 * * * *   root   /opt/sshkeymgr/sshkeymgr.sh PLATFORMID SERVERNAME >/dev/null 2>&1
 ```
 
 Replace `PLATFORMID` with your ZeyOS platform ID and `SERVERNAME` with the server name you have specified in your server list.
