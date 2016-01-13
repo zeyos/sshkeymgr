@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ixml SYSTEM "http://www.ixmldev.com/schema/ixml.dtd">
+<ixml>
+
+<!-- Add your list of servers here -->
+<array var="serverlist">
+	<item>server1</item>
+	<item>server2</item>
+	<item>server3</item>
+</array>
+
+<set var="count">0</set>
+<array:length var="serverlist" var_result="len" />
+<while value1="$count" value2="$len" func="&lt;">
+	<hbox>
+		<for from="0" to="2">
+			<if value1="$serverlist[$count]">
+				<break />
+			</if>
+			<replace pattern="/[^a-z0-9_-]/i" replacement="-" var="key">$serverlist[$count]</replace>
+			<checkbox id="server_$key" caption="$serverlist[$count]">$serverlist[$count]</checkbox>
+			<math:inc var="count" />
+		</for>
+	</hbox>
+</while>
+
+<textbox id="publickey" label="Public Key" type="multi"></textbox>
+
+</ixml>

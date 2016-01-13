@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ixml SYSTEM "http://www.ixmldev.com/schema/ixml.dtd">
+<ixml>
+
+<rest:server>
+	<rest:resource route="/:servername" method="GET">
+		<db:select var_result="users" type="assoc">
+			<db:fields>
+				<db:field>u.email</db:field>
+				<db:field alias="key">k.value</db:field>
+			</db:fields>
+			<db:table alias="u">users</db:table>
+			<db:join>
+				<db:inner alias="x" table="extdata">
+					<db:is field1="u.ID" field2="x.index" />
+					<db:is field="x.entity">users</db:is>
+					<db:is field="x.name" func="^">server</db:is>
+				</db:inner>
+				<db:inner alias="k" table="extdata">
+					<db:is field1="u.ID" field2="k.index" />
+					<db:is field="k.entity">users</db:is>
+					<db:is field="k.name">publickey</db:is>
+				</db:inner>
+			</db:join>
+			<db:is field="u.activity">0</db:is>
+			<db:is field="x.value">$servername</db:is>
+			<db:is field="k.value" func="!="></db:is>
+			<db:isnotnull field="k.value" />
+		</db:select>
+		<header>Content-type: text/plain</header>
+		<foreach var="users" var_value="user">
+			<trim var="key">$user.key</trim>
+			<if value1="$key" value2="=" func="$">
+				<concat var="key"> $user.email</concat>
+			</if>
+			<output>$key$&n;</output>
+		</foreach>
+	</rest:resource>
+</rest:server>
+
+</ixml>
