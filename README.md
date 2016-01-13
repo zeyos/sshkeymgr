@@ -12,8 +12,8 @@ of manually editing all the authorized keys files manually.
 Setup
 -----
 
-Add the extdata form and the REST service to [ZeyOS](https://www.zeyos.com)
-Edit the server list and start assiging permissions and public keys to your users.
+Add the extdata form for the `users` object and the REST service to your [ZeyOS](https://www.zeyos.com) platform.
+Edit the server list in the form and start assiging permissions and public keys to your users in the user management module.
 
 On the linux machines, check out the repository to the `/opt` directoy.
 
@@ -41,3 +41,11 @@ Add a new cronjob to `/etc/cron.d`:
 Replace `PLATFORMID` with your ZeyOS platform ID and `SERVERNAME` with the server name you have specified in your server list.
 
 That's it, hope you find this helpful!
+
+
+Sample Screen
+-------------
+
+This is sample, how the user management in ZeyOS looks like:
+
+![Sample screen][https://raw.githubusercontent.com/zeyosinc/sshkeymgr/master/ZeyOS/screenshot.png]
