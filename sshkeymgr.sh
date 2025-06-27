@@ -4,6 +4,7 @@ set -euo pipefail
 
 # Default target path
 TARGET="/root/.ssh/authorized_keys"
+PARAMS=()
 
 # Parse arguments
 while [[ "$#" -gt 0 ]]; do
@@ -19,10 +20,17 @@ while [[ "$#" -gt 0 ]]; do
   esac
 done
 
-# Remaining required params: PLATFORMID and SERVERNAME
-if [[ "${#PARAMS[@]:-}" -lt 2 ]]; then
+# Help text function
+show_help() {
   echo "Usage: $0 [--target /path/to/authorized_keys] PLATFORMID SERVERNAME"
+  echo "  --target : Optional path to override the default authorized_keys location"
+  echo "  PLATFORMID and SERVERNAME are required"
   exit 1
+}
+
+# Check required parameters
+if [[ ${#PARAMS[@]} -lt 2 ]]; then
+  show_help
 fi
 
 PLATFORMID="${PARAMS[0]}"
