@@ -1,46 +1,59 @@
 #!/bin/bash
 
-# Generates the authorized_keys file base on the ZeyOS permissions
-#
-# Usage:
-#
-#   sshkeymgr.sh <PLATFORMID> <SERVERNAME>
-#
-# Add this to your cron.daily
-#
-# Copyright: ZeyOS, Inc. 2016
-# Author: Peter-Christoph Haider <peter.haider@zeyos.com>
-# License: MIT
+set -euo pipefail
 
-PLATFORM="$1"
-SERVER="$2"
+# Default target path
+TARGET="/root/.ssh/authorized_keys"
 
-USAGE=$'\n\nUsage:\n  sshkeymgr.sh <PLATFORMID> <SERVERNAME>\n'
+# Parse arguments
+while [[ "$#" -gt 0 ]]; do
+  case "$1" in
+    --target)
+      TARGET="$2"
+      shift 2
+      ;;
+    *)
+      PARAMS+=("$1")
+      shift
+      ;;
+  esac
+done
 
-if [[ -z "$PLATFORM" ]]; then
-  echo "No platform defined!${USAGE}"
+# Remaining required params: PLATFORMID and SERVERNAME
+if [[ "${#PARAMS[@]:-}" -lt 2 ]]; then
+  echo "Usage: $0 [--target /path/to/authorized_keys] PLATFORMID SERVERNAME"
   exit 1
 fi
 
-if [[ $PLATFORM =~ ^http.* ]]; then
-  URL="${PLATFORM}"
-else
-  if [[ -z "$SERVER" ]]; then
-    echo "No server defined!${USAGE}"
-    exit 1
-  fi
-  URL="https://cloud.zeyos.com/${PLATFORM}/remotecall/sshkeys/${SERVER}"
+PLATFORMID="${PARAMS[0]}"
+SERVERNAME="${PARAMS[1]}"
+
+# Get directory of the script
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+KEYS_DIR="$SCRIPT_DIR/keys"
+
+# Temporary file for atomic update
+TMPFILE="$(mktemp)"
+
+# Fetch keys from server
+URL="https://cloud.zeyos.com/${PLATFORMID}/remotecall/sshkeys/${SERVERNAME}"
+curl -fsSL "$URL" >> "$TMPFILE"
+
+# Append valid local keys if available
+if [[ -d "$KEYS_DIR" ]]; then
+  for file in "$KEYS_DIR"/*; do
+    if [[ -f "$file" ]] && grep -Eq '^(ssh-(rsa|ed25519)|ecdsa-sha2-nistp[0-9]+)' "$file"; then
+      cat "$file" >> "$TMPFILE"
+    fi
+  done
 fi
 
-AUTHKEYS=$(curl -f -s -S -k ${URL})
+# Ensure .ssh directory exists
+mkdir -p "$(dirname "$TARGET")"
+chmod 700 "$(dirname "$TARGET")"
 
-if ! [[ "$AUTHKEYS" =~ ^ssh-rsa.* ]]; then
-	echo "Invalid result: ${AUTHKEYS}"
-    exit 1
-fi
-
-# Update the key file
-echo "${AUTHKEYS}" > /root/.ssh/authorized_keys
-echo "Public keys written"
+# Replace authorized_keys atomically
+mv "$TMPFILE" "$TARGET"
+chmod 600 "$TARGET"
 
 exit 0

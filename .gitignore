@@ -1,0 +1,15 @@
+# Ignore temp key output
+*.tmp
+
+# Ignore log files
+*.log
+
+# Ignore backup files
+*~
+
+# Ignore local keys
+/keys/*
+
+# Ignore system files
+.DS_Store
+
